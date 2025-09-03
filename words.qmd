@@ -1,0 +1,35 @@
+---
+title: "SCM"
+author: "Krisna Gupta"
+date: today
+date-format: long
+output-file: word
+format: docx
+---
+
+We try varios SCM with the investment data. Data is extracted from UNCTAD to get panel data of countries, various measures of FDI, and we get GDP and Population for control variable. The synthetic countries that we pick are all countries considered developing in the dataset bar unbalanced panel (unfortunately some countries has incomplete series). The result is a set of developing countries that balanced.
+
+The list of countries that serves as control units are as follows
+
+```{r}
+#| echo: false
+#| warnings: false
+ctr<-c("Brunei","Bulgaria","Chile","China","Colombia","Costa Rica","Egypt","Hungary","Iceland","India","Indonesia","Laos","Malaysia","Mexico","Myanmar","Nigeria","Peru","Philippines","Poland","Romania","Russia","Saudi Arabia","South Africa","Thailand","United Arab Emirates","Vietnam")
+ctr
+```
+
+Note that Indonesia is in the list because it's part of the dataset.
+
+The treatment is the increase of paid-up capital to 10M IDR in 2021. Data spans from 1990 to 2023. FDI flow is in Million Current USD
+
+## FDI inflow
+
+First we test using FDI Inflow. Unfortunately the synthetic Indonesia produced by the FDI inflow is rather unstable. We try using FDI flow, FDI flow per capita, FDI flow per GDP and FDI flow per GFCF.
+
+![SCM results for FDI inflow](fig/synth_fdi.png)
+
+![SCM results for FDI inflow per capita](fig/synth_fdic.png)
+
+![SCM results for FDI inflow per GDP](fig/synth_gdp.png)
+
+![SCM results for FDI inflow per GFCF](fig/synth_gfcf.png)
