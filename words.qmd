@@ -20,7 +20,7 @@ ctr
 
 Note that Indonesia is in the list because it's part of the dataset.
 
-The treatment is the increase of paid-up capital to 10M IDR in 2021. Data spans from 1990 to 2023. FDI flow is in Million Current USD
+The treatment is the increase of paid-up capital to 10M IDR in 2021. Data spans from 1990 to 2023. FDI flow is in Million Current USD. For full documentation of the SCM consult to [my github repository](https://github.com/imedkrisna/minvestment)
 
 ## FDI inflow
 
@@ -33,3 +33,37 @@ First we test using FDI Inflow. Unfortunately the synthetic Indonesia produced b
 ![SCM results for FDI inflow per GDP](fig/synth_gdp.png)
 
 ![SCM results for FDI inflow per GFCF](fig/synth_gfcf.png)
+
+We also try running the SCM using sectoral FDI vis-a-vis national FDI. The sectoral FDI is obtained through CEIC. It consists of ISIC rev.4 2 digit category and then aggregated into five different sectoral categories: extractive, manufacturing capital intensive, manufacturing labor intensive, services capital intensive and services labor intensive. We unfortunately have to use the same control unit (i.e., national FDI inflow by countries) because we cannot obtain sectoral FDI from our original control unit.
+
+Again, we get inconsistent synthetic sectors. See below.
+
+![SCM result for exctractive](fig/synth_ex.png)
+
+![SCM result for manufacturing capital intensive](fig/synth_mc.png)
+
+![SCM result of manufacturing labor intensive](fig/synth_ml.png)
+
+![SCM results of services capital intensive](fig/synth_sc.png)
+
+![SCM result of services labor intensive](fig/synth_sl.png)
+
+## FDI Stock
+
+FDI stock have a more consistent results, however. Like above, we use the some country, but different variable i.e., FDI stock in million current USD. Unfortunately we cannot get sectoral FDI stock since the data, to our knowledge, doesn't exist. Results of the FDI stock below.
+
+![SCM results for FDI stock](fig/synth_stock.png)
+
+![SCM results for FDI stock per capita](fig/synth_stockc.png)
+
+![SCM results for FDI stock per GDP](fig/synth_stockg.png)
+
+All shows consistent dynamics: the synthetic Indonesia is consistent with the trend but smoother. The Indonesia current under performance in 2017 onwards is interesting. More importantly, the 2021 time doesn't seem to matter too much, and Indonesia seems to be outperform its synthetic counterpart in 2023. We are not sure whether the paid capital causes this.
+
+## Conclusion
+
+All in all, it is hard to show with certainty the impact of paid-up capital using SCM because there are just so much thing happens during the post-pandemic investment climate. The Omnibus Law is indeed important and there are various other policies that potentially are important than paid-up capital. The SCM results are also sensitive to the variable used. FDI stock seems to be more consistent than FDI inflow, and sectoral FDI is hard to be used because of data limitation.
+
+We can see from the sectoral results that almost all sectors experience increase in FDI post 2021. Hard to say the paid-up capital causes this since there is no theory that can explain this. More plausible explanation is that there're other phenomena at play.
+
+This SCM exercise at least show that the paid-up capital doesn't seem to significantly change Indonesian FDI. It is also show interesting underperformance post 2017 albeit unrelated with the 2021 paid-up capital. The results from Hasran's FDI/project may be more important to show its importance. However, a shock in GTAP can still be done to investment, its just we cannot use the finding in this SCM exercise as the justification for the shock. The GTAP exercise will be theoretical and we need to use literature to get the shock.
