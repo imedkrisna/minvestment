@@ -212,23 +212,314 @@ sb<-sb+scale_x_continuous(breaks = seq(1990,2023,3))+
 wb<-sin_g|>plot_weights()
 wb<-wb+theme_classic()
 
-## Ganti nama
-# fdi = flow, nominal
-# fdis = stock, nominal
-# fdic = flow, per capita
-# fdisc = stock, per capita
-# gdp = % GDP
-# gfcf = % GFCF
+
 ggsave("fig/weight_stockg.png",wb,width = 10, height = 6, dpi = 300)
 ggsave("fig/synth_stockg.png",sb,width = 10, height = 6, dpi = 300)
 
 # Investment by sector
-## extractive
-## manufacture capital intensive
-## manufacture labour intensive
-## service capital intensive
-## service labour intensive
+## ex  = extractive 
+## mc   = manufacture capital intensive
+## ml   = manufacture labour intensive
+## sc   = service capital intensive
+## sl   =service labour intensive
 sector<-"extractive"
-fdi<-fdi|>filter(Economy!=360)
-fdis<-read_excel('inves_group.xlsx')|>filter(Economy==sector)|>
+fdi<-fdi|>filter(Economy!=360)|>filter(Economy!=960)
+fdis<-read_excel('data/inves_group.xlsx')|>filter(Economy==sector)|>
   filter(Year>=1990)|>filter(Year<=2023)
+fdis<-rbind(fdi,fdis)|>arrange(Economy,Year)
+gdps<-gdp|>filter(!(Economy==360 & is.na(gdp)))|>filter(!(Economy==960 & is.na(gdp)))|>
+  mutate(Economy=case_when(
+    Economy=="360"~"extractive",
+    Economy=="960"~"extractive",
+    TRUE~Economy
+  ))
+pops<-pop|>filter(!(Economy==360 & is.na(pop)))|>filter(!(Economy==960 & is.na(pop)))|>
+  mutate(Economy=case_when(
+    Economy=="360"~"extractive",
+    Economy=="960"~"extractive",
+    TRUE~Economy
+  ))
+                                                
+## SCM Extractive
+
+sin<-inner_join(fdis,gdps,by=c("Year","Economy"))
+sin<-inner_join(sin,pops,by=c("Year","Economy"))
+
+sin_ex<-sin|>
+  synthetic_control(outcome = fdi,
+                    unit=Economy,
+                    time=Year,
+                    i_unit="extractive",
+                    i_time=2021,
+                    generate_placebos = T)|>
+  generate_predictor(time_window=2004:2015,
+                     #                   acpi=mean(cpi,na.rm=T),
+                     #                   axr=mean(xr,na.rm=T),
+                     agdp=mean(gdp,na.rm=T),
+                     apop=mean(pop,na.rm=T))|>
+  generate_predictor(time_window=1995,
+                     fdi1=fdi)|>
+  generate_predictor(time_window=2005,
+                     fdi2=fdi)|>
+  generate_predictor(time_window=2015,
+                     fdi3=fdi)|>
+  generate_weights(optimization_window = 1990:2021,
+                   margin_ipop=.02,sigf_ipop=7,bound_ipop=6)|>
+  generate_control()
+
+
+sb<-sin_ex|>plot_trends()
+sb<-sb+scale_x_continuous(breaks = seq(1990,2023,3))+
+  labs(y="FDI flow (Million Current USD)",x="",title=sector)+
+  theme_classic()
+wb<-sin_g|>plot_weights()
+wb<-wb+theme_classic()
+ggsave("fig/weight_ex.png",wb,width = 10, height = 6, dpi = 300)
+ggsave("fig/synth_ex.png",sb,width = 10, height = 6, dpi = 300)
+
+## End of extractive
+## Start if manufacture capital intensive
+
+# Investment by sector
+## ex  = extractive 
+## mc   = manufacture capital intensive
+## ml   = manufacture labour intensive
+## sc   = service capital intensive
+## sl   =service labour intensive
+sector<-"manufacture capital intensive"
+fdi<-fdi|>filter(Economy!=360)|>filter(Economy!=960)
+fdis<-read_excel('data/inves_group.xlsx')|>filter(Economy==sector)|>
+  filter(Year>=1990)|>filter(Year<=2023)
+fdis<-rbind(fdi,fdis)|>arrange(Economy,Year)
+gdps<-gdp|>filter(!(Economy==360 & is.na(gdp)))|>filter(!(Economy==960 & is.na(gdp)))|>
+  mutate(Economy=case_when(
+    Economy=="360"~sector,
+    Economy=="960"~sector,
+    TRUE~Economy
+  ))
+pops<-pop|>filter(!(Economy==360 & is.na(pop)))|>filter(!(Economy==960 & is.na(pop)))|>
+  mutate(Economy=case_when(
+    Economy=="360"~sector,
+    Economy=="960"~sector,
+    TRUE~Economy
+  ))
+
+## SCM MC
+
+sin<-inner_join(fdis,gdps,by=c("Year","Economy"))
+sin<-inner_join(sin,pops,by=c("Year","Economy"))
+
+sin_ex<-sin|>
+  synthetic_control(outcome = fdi,
+                    unit=Economy,
+                    time=Year,
+                    i_unit=sector,
+                    i_time=2021,
+                    generate_placebos = T)|>
+  generate_predictor(time_window=2004:2015,
+                     #                   acpi=mean(cpi,na.rm=T),
+                     #                   axr=mean(xr,na.rm=T),
+                     agdp=mean(gdp,na.rm=T),
+                     apop=mean(pop,na.rm=T))|>
+  generate_predictor(time_window=1995,
+                     fdi1=fdi)|>
+  generate_predictor(time_window=2005,
+                     fdi2=fdi)|>
+  generate_predictor(time_window=2015,
+                     fdi3=fdi)|>
+  generate_weights(optimization_window = 1990:2021,
+                   margin_ipop=.02,sigf_ipop=7,bound_ipop=6)|>
+  generate_control()
+
+
+sb<-sin_ex|>plot_trends()
+sb<-sb+scale_x_continuous(breaks = seq(1990,2023,3))+
+  labs(y="FDI flow (Million Current USD)",x="",title=sector)+
+  theme_classic()
+wb<-sin_g|>plot_weights()
+wb<-wb+theme_classic()
+ggsave("fig/weight_mc.png",wb,width = 10, height = 6, dpi = 300)
+ggsave("fig/synth_mc.png",sb,width = 10, height = 6, dpi = 300)
+
+## End of manufacture capital intensive
+## Start if manufacture labor intensive
+
+# Investment by sector
+## ex  = extractive 
+## mc   = manufacture capital intensive
+## ml   = manufacture labour intensive
+## sc   = service capital intensive
+## sl   =service labour intensive
+sector<-"manufacture labour intensive"
+fdi<-fdi|>filter(Economy!=360)|>filter(Economy!=960)
+fdis<-read_excel('data/inves_group.xlsx')|>filter(Economy==sector)|>
+  filter(Year>=1990)|>filter(Year<=2023)
+fdis<-rbind(fdi,fdis)|>arrange(Economy,Year)
+gdps<-gdp|>filter(!(Economy==360 & is.na(gdp)))|>filter(!(Economy==960 & is.na(gdp)))|>
+  mutate(Economy=case_when(
+    Economy=="360"~sector,
+    Economy=="960"~sector,
+    TRUE~Economy
+  ))
+pops<-pop|>filter(!(Economy==360 & is.na(pop)))|>filter(!(Economy==960 & is.na(pop)))|>
+  mutate(Economy=case_when(
+    Economy=="360"~sector,
+    Economy=="960"~sector,
+    TRUE~Economy
+  ))
+
+
+sin<-inner_join(fdis,gdps,by=c("Year","Economy"))
+sin<-inner_join(sin,pops,by=c("Year","Economy"))
+
+sin_ex<-sin|>
+  synthetic_control(outcome = fdi,
+                    unit=Economy,
+                    time=Year,
+                    i_unit=sector,
+                    i_time=2021,
+                    generate_placebos = T)|>
+  generate_predictor(time_window=2004:2015,
+                     #                   acpi=mean(cpi,na.rm=T),
+                     #                   axr=mean(xr,na.rm=T),
+                     agdp=mean(gdp,na.rm=T),
+                     apop=mean(pop,na.rm=T))|>
+  generate_predictor(time_window=1995,
+                     fdi1=fdi)|>
+  generate_predictor(time_window=2005,
+                     fdi2=fdi)|>
+  generate_predictor(time_window=2015,
+                     fdi3=fdi)|>
+  generate_weights(optimization_window = 1990:2021,
+                   margin_ipop=.02,sigf_ipop=7,bound_ipop=6)|>
+  generate_control()
+
+
+sb<-sin_ex|>plot_trends()
+sb<-sb+scale_x_continuous(breaks = seq(1990,2023,3))+
+  labs(y="FDI flow (Million Current USD)",x="",title=sector)+
+  theme_classic()
+wb<-sin_g|>plot_weights()
+wb<-wb+theme_classic()
+ggsave("fig/weight_ml.png",wb,width = 10, height = 6, dpi = 300) ## Change name
+ggsave("fig/synth_ml.png",sb,width = 10, height = 6, dpi = 300) ## Change name
+
+# Investment by sector
+## ex  = extractive 
+## mc   = manufacture capital intensive
+## ml   = manufacture labour intensive
+## sc   = service capital intensive
+## sl   =service labour intensive
+sector<-"service capital intensive"
+fdi<-fdi|>filter(Economy!=360)|>filter(Economy!=960)
+fdis<-read_excel('data/inves_group.xlsx')|>filter(Economy==sector)|>
+  filter(Year>=1990)|>filter(Year<=2023)
+fdis<-rbind(fdi,fdis)|>arrange(Economy,Year)
+gdps<-gdp|>filter(!(Economy==360 & is.na(gdp)))|>filter(!(Economy==960 & is.na(gdp)))|>
+  mutate(Economy=case_when(
+    Economy=="360"~sector,
+    Economy=="960"~sector,
+    TRUE~Economy
+  ))
+pops<-pop|>filter(!(Economy==360 & is.na(pop)))|>filter(!(Economy==960 & is.na(pop)))|>
+  mutate(Economy=case_when(
+    Economy=="360"~sector,
+    Economy=="960"~sector,
+    TRUE~Economy
+  ))
+
+
+sin<-inner_join(fdis,gdps,by=c("Year","Economy"))
+sin<-inner_join(sin,pops,by=c("Year","Economy"))
+
+sin_ex<-sin|>
+  synthetic_control(outcome = fdi,
+                    unit=Economy,
+                    time=Year,
+                    i_unit=sector,
+                    i_time=2021,
+                    generate_placebos = T)|>
+  generate_predictor(time_window=2004:2015,
+                     #                   acpi=mean(cpi,na.rm=T),
+                     #                   axr=mean(xr,na.rm=T),
+                     agdp=mean(gdp,na.rm=T),
+                     apop=mean(pop,na.rm=T))|>
+  generate_predictor(time_window=1995,
+                     fdi1=fdi)|>
+  generate_predictor(time_window=2005,
+                     fdi2=fdi)|>
+  generate_predictor(time_window=2015,
+                     fdi3=fdi)|>
+  generate_weights(optimization_window = 1990:2021,
+                   margin_ipop=.02,sigf_ipop=7,bound_ipop=6)|>
+  generate_control()
+
+
+sb<-sin_ex|>plot_trends()
+sb<-sb+scale_x_continuous(breaks = seq(1990,2023,3))+
+  labs(y="FDI flow (Million Current USD)",x="",title=sector)+
+  theme_classic()
+wb<-sin_g|>plot_weights()
+wb<-wb+theme_classic()
+ggsave("fig/weight_sc.png",wb,width = 10, height = 6, dpi = 300) ## Change name
+ggsave("fig/synth_sc.png",sb,width = 10, height = 6, dpi = 300) ## Change name
+
+# Investment by sector
+## ex  = extractive 
+## mc   = manufacture capital intensive
+## ml   = manufacture labour intensive
+## sc   = service capital intensive
+## sl   =service labour intensive
+sector<-"service labour intensive"
+fdi<-fdi|>filter(Economy!=360)|>filter(Economy!=960)
+fdis<-read_excel('data/inves_group.xlsx')|>filter(Economy==sector)|>
+  filter(Year>=1990)|>filter(Year<=2023)
+fdis<-rbind(fdi,fdis)|>arrange(Economy,Year)
+gdps<-gdp|>filter(!(Economy==360 & is.na(gdp)))|>filter(!(Economy==960 & is.na(gdp)))|>
+  mutate(Economy=case_when(
+    Economy=="360"~sector,
+    Economy=="960"~sector,
+    TRUE~Economy
+  ))
+pops<-pop|>filter(!(Economy==360 & is.na(pop)))|>filter(!(Economy==960 & is.na(pop)))|>
+  mutate(Economy=case_when(
+    Economy=="360"~sector,
+    Economy=="960"~sector,
+    TRUE~Economy
+  ))
+
+
+sin<-inner_join(fdis,gdps,by=c("Year","Economy"))
+sin<-inner_join(sin,pops,by=c("Year","Economy"))
+
+sin_ex<-sin|>
+  synthetic_control(outcome = fdi,
+                    unit=Economy,
+                    time=Year,
+                    i_unit=sector,
+                    i_time=2021,
+                    generate_placebos = T)|>
+  generate_predictor(time_window=2004:2015,
+                     #                   acpi=mean(cpi,na.rm=T),
+                     #                   axr=mean(xr,na.rm=T),
+                     agdp=mean(gdp,na.rm=T),
+                     apop=mean(pop,na.rm=T))|>
+  generate_predictor(time_window=1995,
+                     fdi1=fdi)|>
+  generate_predictor(time_window=2005,
+                     fdi2=fdi)|>
+  generate_predictor(time_window=2015,
+                     fdi3=fdi)|>
+  generate_weights(optimization_window = 1990:2021,
+                   margin_ipop=.02,sigf_ipop=7,bound_ipop=6)|>
+  generate_control()
+
+
+sb<-sin_ex|>plot_trends()
+sb<-sb+scale_x_continuous(breaks = seq(1990,2023,3))+
+  labs(y="FDI flow (Million Current USD)",x="",title=sector)+
+  theme_classic()
+wb<-sin_g|>plot_weights()
+wb<-wb+theme_classic()
+ggsave("fig/weight_sl.png",wb,width = 10, height = 6, dpi = 300) ## Change name
+ggsave("fig/synth_sl.png",sb,width = 10, height = 6, dpi = 300) ## Change name
