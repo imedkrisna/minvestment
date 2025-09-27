@@ -216,6 +216,158 @@ wb<-wb+theme_classic()
 ggsave("fig/weight_stockg.png",wb,width = 10, height = 6, dpi = 300)
 ggsave("fig/synth_stockg.png",sb,width = 10, height = 6, dpi = 300)
 
+#######################################################################################################
+
+
+# 2.5M paid-up capital di 2013
+
+## SCM stock 
+
+sin<-inner_join(fdi,gdp,by=c("Year","Economy"))
+sin<-inner_join(sin,pop,by=c("Year","Economy"))
+#sin<-inner_join(sin,cpi,by=c("Year","Economy"))
+#sin<-inner_join(sin,xr,by=c("Year","Economy"))
+
+sin<-sin|>mutate(Economy=replace(Economy,Economy=="960","360"))|>na.omit() # omit 2 indos
+
+
+sin_out<-sin|>
+  synthetic_control(outcome = fdi,
+                    unit=Economy,
+                    time=Year,
+                    i_unit="360",
+                    i_time=2013,
+                    generate_placebos = T)|>
+  generate_predictor(time_window=2004:2010,
+                     #                   acpi=mean(cpi,na.rm=T),
+                     #                   axr=mean(xr,na.rm=T),
+                     agdp=mean(gdp,na.rm=T),
+                     apop=mean(pop,na.rm=T))|>
+  generate_predictor(time_window=1995,
+                     fdi1=fdi)|>
+  generate_predictor(time_window=2005,
+                     fdi2=fdi)|>
+  generate_predictor(time_window=2010,
+                     fdi3=fdi)|>
+  generate_weights(optimization_window = 1990:2013,
+                   margin_ipop=.02,sigf_ipop=7,bound_ipop=6)|>
+  generate_control()
+
+
+sb<-sin_out|>plot_trends()
+sb<-sb+scale_x_continuous(breaks = seq(1990,2023,3))+
+  scale_y_continuous(labels=label_number(scale=1e-3),breaks=pretty_breaks())+
+  labs(y="FDI stock (in Billion current USD)",x="",title="")+
+  theme_classic()
+wb<-sin_out|>plot_weights()
+wb<-wb+theme_classic()
+
+## Ganti nama
+# fdi = flow, nominal
+# fdis = stock, nominal
+# fdic = flow, per capita
+# fdisc = stock, per capita
+# gdp = % GDP
+# gfcf = % GFCF
+ggsave("fig/weight_stock13.png",wb,width = 10, height = 6, dpi = 300)
+ggsave("fig/synth_stock13.png",sb,width = 10, height = 6, dpi = 300)
+
+## SCM per capita
+
+sin<-inner_join(fdic,gdp,by=c("Year","Economy"))
+sin<-inner_join(sin,pop,by=c("Year","Economy"))
+#sin<-inner_join(sin,cpi,by=c("Year","Economy"))
+#sin<-inner_join(sin,xr,by=c("Year","Economy"))
+
+sin<-sin|>mutate(Economy=replace(Economy,Economy=="960","360"))|>na.omit() # omit 2 indos
+
+
+sin_c<-sin|>
+  synthetic_control(outcome = fdi,
+                    unit=Economy,
+                    time=Year,
+                    i_unit="360",
+                    i_time=2013,
+                    generate_placebos = T)|>
+  generate_predictor(time_window=2004:2010,
+                     #                   acpi=mean(cpi,na.rm=T),
+                     #                   axr=mean(xr,na.rm=T),
+                     agdp=mean(gdp,na.rm=T),
+                     apop=mean(pop,na.rm=T))|>
+  generate_predictor(time_window=1995,
+                     fdi1=fdi)|>
+  generate_predictor(time_window=2005,
+                     fdi2=fdi)|>
+  generate_predictor(time_window=2010,
+                     fdi3=fdi)|>
+  generate_weights(optimization_window = 1990:2013,
+                   margin_ipop=.02,sigf_ipop=7,bound_ipop=6)|>
+  generate_control()
+
+
+sb<-sin_c|>plot_trends()
+sb<-sb+scale_x_continuous(breaks = seq(1990,2023,3))+
+  labs(y="FDI stock per capita in current USD",x="",title="")+
+  theme_classic()
+wb<-sin_c|>plot_weights()
+wb<-wb+theme_classic()
+
+## Ganti nama
+# fdi = flow, nominal
+# fdis = stock, nominal
+# fdic = flow, per capita
+# fdisc = stock, per capita
+# gdp = % GDP
+# gfcf = % GFCF
+ggsave("fig/weight_stockc13.png",wb,width = 10, height = 6, dpi = 300)
+ggsave("fig/synth_stockc13.png",sb,width = 10, height = 6, dpi = 300)
+
+## SCM FDI per GDP
+
+sin<-inner_join(fdig,gdp,by=c("Year","Economy"))
+sin<-inner_join(sin,pop,by=c("Year","Economy"))
+#sin<-inner_join(sin,cpi,by=c("Year","Economy"))
+#sin<-inner_join(sin,xr,by=c("Year","Economy"))
+
+sin<-sin|>mutate(Economy=replace(Economy,Economy=="960","360"))|>na.omit() # omit 2 indos
+
+
+sin_g<-sin|>
+  synthetic_control(outcome = fdi,
+                    unit=Economy,
+                    time=Year,
+                    i_unit="360",
+                    i_time=2013,
+                    generate_placebos = T)|>
+  generate_predictor(time_window=2004:2010,
+                     #                   acpi=mean(cpi,na.rm=T),
+                     #                   axr=mean(xr,na.rm=T),
+                     agdp=mean(gdp,na.rm=T),
+                     apop=mean(pop,na.rm=T))|>
+  generate_predictor(time_window=1995,
+                     fdi1=fdi)|>
+  generate_predictor(time_window=2005,
+                     fdi2=fdi)|>
+  generate_predictor(time_window=2010,
+                     fdi3=fdi)|>
+  generate_weights(optimization_window = 1990:2013,
+                   margin_ipop=.02,sigf_ipop=7,bound_ipop=6)|>
+  generate_control()
+
+
+sb<-sin_g|>plot_trends()
+sb<-sb+scale_x_continuous(breaks = seq(1990,2023,3))+
+  labs(y="FDI stock per GDP (%)",x="",title="")+
+  theme_classic()
+wb<-sin_g|>plot_weights()
+wb<-wb+theme_classic()
+
+
+ggsave("fig/weight_stockg13.png",wb,width = 10, height = 6, dpi = 300)
+ggsave("fig/synth_stockg13.png",sb,width = 10, height = 6, dpi = 300)
+
+
+
 # Investment by sector
 ## ex  = extractive 
 ## mc   = manufacture capital intensive
