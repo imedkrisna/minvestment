@@ -107,7 +107,9 @@ All shows consistent dynamics: the synthetic Indonesia is consistent with the tr
 
 ## GTAP results
 
-This is the GTAP results. We simulatae the potential improvement in the Indonesian economy supposed the relaxation of the paid-up capital improves Indonesia's FDI situation.
+This is the GTAP results. We simulatae the potential improvement in the Indonesian economy supposed the relaxation of the paid-up capital improves Indonesia's FDI situation. It is assumed that the FDI inflow approximately increased by 1%.
+
+I use GTAP11 database for the database. As for the model, the Standard GTAP model version 7 is used.
 
 ```{r}
 #| echo: false
@@ -116,37 +118,47 @@ This is the GTAP results. We simulatae the potential improvement in the Indonesi
 #| tbl-cap: "GTAP results: macroeconomic indicators"
 library(tidyverse)
 library(readxl)
-library(kableExtra)
+library(flextable)
 var<-c("PDB Indonesia","Inflasi Indonesia","Konsumsi Indonesia",
   "Belanja Pemerintah Indonesia","Trade Balance Indonesia", "Ekspor Indonesia",
   "Impor Indonesia","Employment unskilled Indonesia","Employment skilled Indonesia",
   "Rate of return Indonesia"
 )
-tab<-read_xlsx("data/solution_var.xlsx")
-tab2<-tab|>select(variabel, capital2)|>
+tab<-read_xlsx("data/solution_var.xlsx")|>
+  select(variabel,capital2)|>
   filter(variabel%in%var)
+tab2<-qflextable(tab)
 tab2
 ```
+
+@tbl-1 shows what happens to the FDI increase. The increase of FDI by 1% would accompanied by a GDP increase by around 0.21%. Inflation would go up by around 0.86% and consumption by about 0.37%. Jobs would increase by around 0.5%, slightly more for workers without tertiery degrees.
+
+It is important to note that the increase in FDI means a positive capital inflow. The flipside is a current account deficit: an increase of current account deficit will be around 1% of GDP. Exports will go down amid large increase in domestic demands fueled by a booming investment. Import goes up thanks to the economy's need to build up capital goods. This is a natural process and attempts to reduce current account deficit will only leads to an inefficient capital accumulation.
 
 ```{r}
 #| echo: false
 #| warnings: false
+#| message: false
 #| label: tbl-2
 #| tbl-cap: "GTAP Results: Sectoral output"
 
 tab<-read_xlsx("data/solution_sec.xlsx")
-tab2<-tab|>select(variabel, capital2)|>
-  filter(variabel%in%var)
+tab<-tab|>select(variabel, capital2)
+tab2<-qflextable(tab)
 tab2
 ```
+
+@tbl-2 shows the change in sectoral outputs. An investment-driven growth would see a booming in constructions and its inputs, namely non-metalic minerals and fabricated metals. Additionally, capital-intensive sectors will benefit amid more abundant capital. These sectors will absorb factor of production from other sectors, namely the tradable sectors that now can rely on imports.
 
 ## Conclusion
 
 All in all, it is hard to show with certainty the impact of paid-up capital using SCM because there are just so much thing happens during the post-pandemic investment climate. The Omnibus Law is indeed important and there are various other policies that potentially are important than paid-up capital. The SCM results are also sensitive to the variable used. FDI stock seems to be more consistent than FDI inflow, and sectoral FDI is hard to be used because of data limitation.
 
-We can see from the sectoral results that almost all sectors experience increase in FDI post 2021. Hard to say the paid-up capital causes this since there is no theory that can explain this. More plausible explanation is that there're other phenomena at play.
+We can see from the sectoral results that almost all sectors experience increase in FDI post 2021. Hard to say the paid-up capital causes this since there is no theory that can explain this. More plausible explanation is that there're other phenomena at play. e.g.. Omnibus bill introduces many many other investment-related policies that are more important than increased pain-up capital. Probably the most important are the Risk Based Assessment and Nickel export ban.
 
-This SCM exercise at least show that the paid-up capital doesn't seem to significantly change Indonesian FDI. It is also show interesting underperformance post 2017 albeit unrelated with the 2021 paid-up capital. The results from Hasran's FDI/project may be more important to show its importance. However, a shock in GTAP can still be done to investment, its just we cannot use the finding in this SCM exercise as the justification for the shock. The GTAP exercise will be theoretical and we need to use literature to get the shock.
+This SCM exercise at least show that the paid-up capital doesn't seem to significantly change Indonesian FDI. It is also show interesting underperformance post 2017 albeit unrelated with the 2021 paid-up capital. The results from Hasran's FDI/project may be more important to show its importance. However, a shock in GTAP can still be done to investment, its just we cannot use the finding in this SCM exercise as the justification for the shock. 
+
+The GTAP exercise is conducted by shocking investment. This lead to an increase of FDI by around 1% to Indonesia. The results are that capital-producing sectors are growing, as well as the more capital-intensive sectors. Meanwhile, tradables, especially the more labor-intensive sector ones, are growing. It should be noted that the current account deficit will go up, which is natural since capital inflow goes up. An attempt to discourage current account deficit e.g., trade would lead to a less efficient capital accumulation.
 
 ## References {.unnumbered}
 
