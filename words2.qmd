@@ -3,7 +3,7 @@ title: "SCM and GTAP sim"
 author: "Krisna Gupta"
 date: today
 date-format: long
-format: docx
+format: pdf
 ---
 
 ## Introduction
