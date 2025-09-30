@@ -3,7 +3,7 @@ title: "SCM and GTAP sim"
 author: "Krisna Gupta"
 date: today
 date-format: long
-format: pdf
+format: docx
 ---
 
 ## Introduction
@@ -111,44 +111,15 @@ This is the GTAP results. We simulatae the potential improvement in the Indonesi
 
 I use GTAP11 database for the database. As for the model, the Standard GTAP model version 7 is used.
 
-```{r}
-#| echo: false
-#| warnings: false
-#| label: tbl-1
-#| tbl-cap: "GTAP results: macroeconomic indicators"
-library(tidyverse)
-library(readxl)
-library(flextable)
-var<-c("PDB Indonesia","Inflasi Indonesia","Konsumsi Indonesia",
-  "Belanja Pemerintah Indonesia","Trade Balance Indonesia", "Ekspor Indonesia",
-  "Impor Indonesia","Employment unskilled Indonesia","Employment skilled Indonesia",
-  "Rate of return Indonesia"
-)
-tab<-read_xlsx("data/solution_var.xlsx")|>
-  select(variabel,capital2)|>
-  filter(variabel%in%var)
-tab2<-qflextable(tab)
-tab2
-```
+put "solution_var.xlsx" here
 
-@tbl-1 shows what happens to the FDI increase. The increase of FDI by 1% would accompanied by a GDP increase by around 0.21%. Inflation would go up by around 0.86% and consumption by about 0.37%. Jobs would increase by around 0.5%, slightly more for workers without tertiery degrees.
+table above shows what happens to the FDI increase. The increase of FDI by 1% would accompanied by a GDP increase by around 0.21%. Inflation would go up by around 0.86% and consumption by about 0.37%. Jobs would increase by around 0.5%, slightly more for workers without tertiery degrees.
 
 It is important to note that the increase in FDI means a positive capital inflow. The flipside is a current account deficit: an increase of current account deficit will be around 1% of GDP. Exports will go down amid large increase in domestic demands fueled by a booming investment. Import goes up thanks to the economy's need to build up capital goods. This is a natural process and attempts to reduce current account deficit will only leads to an inefficient capital accumulation.
 
-```{r}
-#| echo: false
-#| warnings: false
-#| message: false
-#| label: tbl-2
-#| tbl-cap: "GTAP Results: Sectoral output"
+Put "solution_sec.xlsx" here
 
-tab<-read_xlsx("data/solution_sec.xlsx")
-tab<-tab|>select(variabel, capital2)
-tab2<-qflextable(tab)
-tab2
-```
-
-@tbl-2 shows the change in sectoral outputs. An investment-driven growth would see a booming in constructions and its inputs, namely non-metalic minerals and fabricated metals. Additionally, capital-intensive sectors will benefit amid more abundant capital. These sectors will absorb factor of production from other sectors, namely the tradable sectors that now can rely on imports.
+table above shows the change in sectoral outputs. An investment-driven growth would see a booming in constructions and its inputs, namely non-metalic minerals and fabricated metals. Additionally, capital-intensive sectors will benefit amid more abundant capital. These sectors will absorb factor of production from other sectors, namely the tradable sectors that now can rely on imports.
 
 ## Conclusion
 
